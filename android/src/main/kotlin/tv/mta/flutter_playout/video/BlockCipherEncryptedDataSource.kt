@@ -14,7 +14,7 @@ import java.io.InputStream
 import java.lang.RuntimeException
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
-import javax.crypto.spec.IvParameterSpec
+//import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 const val TAG = "ENCRYPTING PROCESS"
@@ -54,13 +54,13 @@ class BlockCipherEncryptedDataSource(
     private fun setupInputStream() {
         val path = uri.path ?: throw RuntimeException("Tried decrypting uri with no path: $uri")
         val encryptedFileStream = File(path).inputStream()
-        val initializationVector = ByteArray(cipher.blockSize)
-        encryptedFileStream.read(initializationVector)
+//        val initializationVector = ByteArray(cipher.blockSize)
+//        encryptedFileStream.read(initializationVector)
         streamingCipherInputStream =
             StreamingCipherInputStream(
                 encryptedFileStream,
                 cipher,
-                IvParameterSpec(initializationVector),
+//                IvParameterSpec(initializationVector),
                 secretKeySpec
             )
     }
@@ -139,7 +139,7 @@ class BlockCipherEncryptedDataSource(
     class StreamingCipherInputStream(
         private val sourceStream: InputStream,
         private var cipher: Cipher,
-        private val initialIvParameterSpec: IvParameterSpec,
+//        private val initialIvParameterSpec: IvParameterSpec,
         private val secretKeySpec: SecretKeySpec
     ) : CipherInputStream(
         sourceStream, cipher
@@ -159,8 +159,8 @@ class BlockCipherEncryptedDataSource(
                 if (bytesUntilPreviousBlockStart <= 0) {
                     cipher.init(
                         Cipher.DECRYPT_MODE,
-                        secretKeySpec,
-                        initialIvParameterSpec
+                        secretKeySpec
+//                        initialIvParameterSpec
                     )
                     return
                 }
@@ -177,8 +177,8 @@ class BlockCipherEncryptedDataSource(
 
                 cipher.init(
                     Cipher.DECRYPT_MODE,
-                    secretKeySpec,
-                    IvParameterSpec(previousEncryptedBlock)
+                    secretKeySpec
+//                    IvParameterSpec(previousEncryptedBlock)
                 )
                 skip(bytesUntilPreviousBlockStart + cipherBlockSize)
 

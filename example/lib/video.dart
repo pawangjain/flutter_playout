@@ -9,10 +9,11 @@ import 'package:flutter_playout/video.dart';
 import 'package:flutter_playout_example/hls/getManifestLanguages.dart';
 
 class VideoPlayout extends StatefulWidget {
+  final String filePath;
   final PlayerState desiredState;
   final bool showPlayerControls;
 
-  const VideoPlayout({Key key, this.desiredState, this.showPlayerControls})
+  const VideoPlayout({Key key, this.desiredState, this.showPlayerControls, this.filePath})
       : super(key: key);
 
   @override
@@ -24,23 +25,26 @@ class _VideoPlayoutState extends State<VideoPlayout>
   final String _url = null;
   List<HLSManifestLanguage> _hlsLanguages = [];
 
+  PlayerState currPlayerState;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, _getHLSManifestLanguages);
+    currPlayerState = widget.desiredState;
+    // Future.delayed(Duration.zero, _getHLSManifestLanguages);
   }
 
-  Future<void> _getHLSManifestLanguages() async {
-    if (!Platform.isIOS && _url != null && _url.isNotEmpty) {
-      _hlsLanguages = await getManifestLanguages(_url);
-      setState(() {});
-    }
-  }
+  // Future<void> _getHLSManifestLanguages() async {
+  //   if (!Platform.isIOS && _url != null && _url.isNotEmpty) {
+  //     _hlsLanguages = await getManifestLanguages(_url);
+  //     setState(() {});
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
+      child: Stack(
         children: <Widget>[
           /* player */
           AspectRatio(
@@ -54,15 +58,27 @@ class _VideoPlayoutState extends State<VideoPlayout>
               isLiveStream: false,
               position: 0,
               // url: 'https://downloads.akonnect.org/energizer/2022-02/2022_02_15_021513_0bb8f7_hin.mp4',//_url,
-              url: '/storage/emulated/0/Download/encrypted.mp4',
+              url: widget.filePath,// '/storage/emulated/0/Download/encrypted.mp4',
+              // url: '/storage/emulated/0/Download/unencrypted.mp4',
               aesKey: '85BE62F9AC34D107',
               onViewCreated: _onViewCreated,
-              desiredState: widget.desiredState,
+              desiredState: currPlayerState, // widget.desiredState,
               preferredTextLanguage: "en",
               loop: false,
             ),
           ),
-        
+          ElevatedButton(
+              onPressed: () {
+                if (currPlayerState == PlayerState.PLAYING) {
+                  currPlayerState = PlayerState.PAUSED;
+                } else {
+                  currPlayerState = PlayerState.PLAYING;
+                }
+                setState(() {
+                  
+                });
+              },
+              child: Text('Play / Pause'))
         ],
       ),
     );

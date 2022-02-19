@@ -1,7 +1,12 @@
+// import 'dart:html';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_playout/player_state.dart';
 // import 'package:flutter_playout_example/audio.dart';
 import 'package:flutter_playout_example/video.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(MainApp());
 
@@ -24,61 +29,123 @@ class PlayoutExample extends StatefulWidget {
 class _PlayoutExampleState extends State<PlayoutExample> {
   PlayerState _desiredState = PlayerState.PLAYING;
   bool _showPlayerControls = true;
+
+  List<String> extdirs = [];
+
+  var currFilePath = '/storage/emulated/0/Download/dada.mp4';
+
+  UniqueKey currentPlayerKey =
+      UniqueKey(); // = extDirectories[1].toString().split('/');
+
+  getExternalSdCardPath() async {
+    file = [];
+    extdirs = [];
+    List<Directory> extDirectories = await getExternalStorageDirectories();
+
+    extDirectories.forEach((e) => extdirs.add(e.path + ' ## '));
+    String rebuiltPath = '', encVideoDirName = 'dada';
+
+    print("niruma rebuilt path: " + extdirs.toString());
+
+    try {
+      if (extDirectories.length > 1) {
+        List<String> dirs = extDirectories[1].toString().split('/');
+        rebuiltPath = '/' + dirs[1] + '/' + dirs[2] + '/' + encVideoDirName;
+        Directory tempDir = Directory(rebuiltPath);
+        if (!tempDir.existsSync()) {
+          rebuiltPath = '';
+        } else {
+          file = Directory(rebuiltPath).listSync();
+        }
+      }
+    } catch (e) {
+      print("EX: " + e.toString());
+    }
+
+    setState(() {});
+    // return rebuiltPath;
+  }
+
+  // String directory = '/storage/emulated/0/Download';
+  List<FileSystemEntity> file = [];
+
+  // Make New Function
+  // void _listofFiles() async {
+  //   setState(() {
+  //     // file = Directory("$directory")
+  //     //     .listSync(); //use your folder name insted of resume.
+  //     int i = 0;
+  //     i++;
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey,
       appBar: AppBar(
-        brightness: Brightness.dark,
-        backgroundColor: Colors.grey[900],
+        // brightness: Brightness.dark,
+        // backgroundColor: Colors.grey[900],
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {},
         ),
         actions: <Widget>[
-          
           /* toggle show player controls */
+          IconButton(
+            icon: Icon(Icons.bug_report),
+            onPressed: () async {
+              Map<Permission, PermissionStatus> statuses = await [
+                // Permission.location,
+                Permission.storage,
+              ].request();
+            },
+          ),
           IconButton(
             icon: Icon(Icons.adjust),
             onPressed: () async {
-              setState(() {
-                _showPlayerControls = !_showPlayerControls;
-              });
+              // setState(() {
+              //   _showPlayerControls = !_showPlayerControls;
+              // });
+
+              getExternalSdCardPath();
             },
           ),
         ],
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              Icons.local_play,
-              color: Colors.white,
-            ),
-            Container(
-              width: 7.0,
-            ),
-            Text(
-              "AV Player",
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6
-                  .copyWith(color: Colors.white),
-            )
-          ],
-        ),
       ),
       body: Container(
-        color: Colors.black,
         child: CustomScrollView(
           slivers: <Widget>[
-           
             SliverToBoxAdapter(
-                child: VideoPlayout(
-              desiredState: _desiredState,
-              showPlayerControls: _showPlayerControls,
+                child: Column(
+              children: [
+                VideoPlayout(
+                  key: currentPlayerKey,
+                  desiredState: _desiredState,
+                  showPlayerControls: _showPlayerControls,
+                  filePath: currFilePath,
+                ),
+                FlutterLogo(),
+                Text(currFilePath, style: TextStyle(color: Colors.red),),
+                Text(extdirs.toString()),
+                ListView.builder(
+                    itemCount: file.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text(file[index].path),
+                          onTap: () {
+                            currFilePath = file[index].path;
+                            currentPlayerKey = UniqueKey();
+                            setState(() {});
+                          },
+                        ),
+                      );
+                    })
+              ],
             )),
             // SliverToBoxAdapter(
             //   child: Container(

@@ -259,7 +259,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
         setUseController(showControls);
 
-        listenForPlayerTimeChange();
+//        listenForPlayerTimeChange();
 
         this.setPlayer(mPlayerView);
 
@@ -509,7 +509,9 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
         handler.post(runnable);
     }
 
-    private void updateMediaSource() {
+    private void updateMediaSource_unenc() {
+        Log.d("#dada", "updateMediaSource1");
+
         /* Produces DataSource instances through which media data is loaded. */
         // DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
         // Util.getUserAgent(context, "flutter_playout"));
@@ -536,22 +538,86 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
         Log.d("#dada", "keyBytes = " + keyBytes.toString());
 
 
-        DataSource.Factory dataSourceFactory = new BlockCipherEncryptedDataSourceFactory(
-//                new SecretKeySpec(keyBytes, AES_ALGORITHM),
-                new SecretKeySpec(Constants.secretKey, AES_ALGORITHM),
-                uri,
-                AES_TRANSFORMATION);
+//        DataSource.Factory dataSourceFactory = new BlockCipherEncryptedDataSourceFactory(
+////                new SecretKeySpec(keyBytes, AES_ALGORITHM),
+//                new SecretKeySpec(Constants.secretKey, AES_ALGORITHM),
+//                uri,
+//                AES_TRANSFORMATION);
+
+         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+         Util.getUserAgent(context, "flutter_playout"));
 
         Log.d("#dada", "dataSourceFactory PASS");
 
         try {
             ProgressiveMediaSource videoSource;
+//            videoSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+//                    new MediaItem.Builder().setUri(uri).build());
+
+//            videoSource = new
+//                     ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+
+             videoSource = new
+             ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+
+//            mPlayerView.setMediaSource(videoSource);
+            mPlayerView.prepare(videoSource);
+            // mPlayerView.playWhenReady = true;
+//            mPlayerView.setPlayWhenReady(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("#dada", "#EXC encrypted playback NIRUMA.");
+        }
+    }
+
+    private void updateMediaSource() {
+        Log.d("#dada", "updateMediaSource_ENCRYDDDDD");
+        File encryptedFile = new File(this.url);
+        Log.d("#dada", "URL = " + this.url);
+        Uri uri = Uri.fromFile(encryptedFile);
+
+        Log.d("#dada", "uri = " + uri.toString());
+
+//        val secretKey = "85BE62F9AC34D107".map { it.toByte() }.toByteArray()
+        try {
+
+        byte[] secretKey = "85BE62F9AC34D107".getBytes("UTF-8");// hexStringToByteArray("85BE62F9AC34D107");
+
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, "AES");
+
+        Log.d("#dada", "updateMediaSource_ENCRY---");
+
+
+        DataSource.Factory dataSourceFactory = new BlockCipherEncryptedDataSourceFactory(
+                secretKeySpec,
+                uri,
+                "AES/ECB/PKCS7Padding");
+
+        Log.d("#dada", "updateMediaSource_ENCRY2");
+
+
+
+            ProgressiveMediaSource videoSource;
             videoSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
                     new MediaItem.Builder().setUri(uri).build());
+
+            Log.d("#dada", "updateMediaSource_ENCRY3");
+
+//            videoSource = new
+//                    ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+
+//            mPlayerView.prepare(videoSource);
+
             mPlayerView.setMediaSource(videoSource);
-            mPlayerView.prepare();
-            // mPlayerView.playWhenReady = true;
+            Log.d("#dada", "prepare");
+            mPlayerView.prepare(videoSource);
             mPlayerView.setPlayWhenReady(true);
+
+            Log.d("#dada", "updateMediaSource_ENCRY123 ENDDDD");
+
+            //             mPlayerView.playWhenReady = true;
+
 
         } catch (Exception e) {
             e.printStackTrace();
