@@ -572,7 +572,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
     }
 
     private void updateMediaSource() {
-        Log.d("#dada", "updateMediaSource_ENCRYDDDDD");
+        Log.d("#dada", "updateMediaSource_ENCRYNNN");
         File encryptedFile = new File(this.url);
         Log.d("#dada", "URL = " + this.url);
         Uri uri = Uri.fromFile(encryptedFile);
@@ -582,7 +582,8 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 //        val secretKey = "85BE62F9AC34D107".map { it.toByte() }.toByteArray()
         try {
 
-        byte[] secretKey = "85BE62F9AC34D107".getBytes("UTF-8");// hexStringToByteArray("85BE62F9AC34D107");
+        // byte[] secretKey = "85BE62F9AC34D107".getBytes("UTF-8");// hexStringToByteArray("85BE62F9AC34D107");
+        byte[] secretKey = this.aesKey.getBytes("UTF-8");// hexStringToByteArray("85BE62F9AC34D107");
 
         SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, "AES");
 

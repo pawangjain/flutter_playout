@@ -15,7 +15,35 @@ dependencies:
   cupertino_icons: ^0.1.2
   permission_handler: ^8.2.5
   path_provider: ^2.0.6
-  http:
+  cached_network_image: ^3.1.0
+
+  device_info_plus: ^2.1.0
+    
+  http: ^0.13.3
+
+  intl: ^0.17.0
+
+  # flutter_html: ^2.1.1
+
+  # flutter_inappwebview: ^5.3.2
+
+  # flutter_native_timezone: ^1.0.10
+
+  file_picker: ^4.2.0
+
+  flutter_styled_toast: ^2.0.0
+
+  font_awesome_flutter: ^9.1.0
+
+  # package_info_plus: ^1.0.6
+
+  provider: ^5.0.0
+
+  shared_preferences: ^2.0.6
+
+  url_launcher: ^6.0.3
+
+  version: ^2.0.0
   
 
 dev_dependencies:
@@ -35,6 +63,22 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+  - assets/
+  - assets/images/
+
+  fonts:
+  #   - family: Lohit
+  #     fonts:
+  #     - asset: assets/fonts/Lohit-Gujarati.ttf
+  # #    - asset: fonts/Raleway-Italic.ttf
+  # #      style: italic
+  - family: Cambria
+    fonts:
+    - asset: assets/fonts/cambria.ttf
+      weight: 700
 
   # To add assets to your application, add an assets section, like this:
   # assets:
